@@ -17,66 +17,65 @@ public class GeoMapLocation implements Serializable {
     @XmlElement(name = "coords")
     private final GeoCoordinate coords;
 
-    @XmlElement(name = "riskScore")
-    private final Integer riskScore;
+    @XmlElement(name = "rs")
+    private final Integer rs;
 
-    @XmlElement(name = "geoRiskScoreIndicator")
-    private final GeoRiskScoreIndicator geoRiskScoreIndicator;
+    @XmlElement(name = "geoRsInd")
+    private final GeoRiskScoreIndicator geoRsInd;
 
     public GeoMapLocation(){
-        coords = new GeoCoordinate();
-        riskScore = 1;
-        geoRiskScoreIndicator = GeoRiskScoreIndicator.GREEN;
+        this.coords = new GeoCoordinate();
+        this.rs = 1;
+        this.geoRsInd = GeoRiskScoreIndicator.GREEN;
     }
 
-    public GeoMapLocation(final GeoCoordinate coords, final Integer riskScore) {
+    public GeoMapLocation(final GeoCoordinate coords, final Integer rs) {
         this.coords = coords;
-        this.riskScore = riskScore;
-        this.geoRiskScoreIndicator = (riskScore >= 1 && riskScore <= 3) ? GeoRiskScoreIndicator.GREEN :
-                (riskScore >= 4 && riskScore <= 5) ? GeoRiskScoreIndicator.YELLOW :
-                        (riskScore >= 6 && riskScore <= 7) ? GeoRiskScoreIndicator.ORANGE :
-                                (riskScore == 8) ? GeoRiskScoreIndicator.RED : GeoRiskScoreIndicator.DARK_RED;
+        this.rs = rs;
+        this.geoRsInd = (rs >= 1 && rs <= 3) ? GeoRiskScoreIndicator.GREEN :
+                (rs >= 4 && rs <= 5) ? GeoRiskScoreIndicator.YELLOW :
+                        (rs >= 6 && rs <= 7) ? GeoRiskScoreIndicator.ORANGE :
+                                (rs == 8) ? GeoRiskScoreIndicator.RED : GeoRiskScoreIndicator.DARK_RED;
     }
 
     public GeoCoordinate getCoords() {
         return coords;
     }
 
-    public Integer getRiskScore() {
-        return riskScore;
+    public Integer getRs() {
+        return rs;
     }
 
-    public GeoRiskScoreIndicator getGeoRiskScoreIndicator() {
-        return geoRiskScoreIndicator;
+    public GeoRiskScoreIndicator getGeoRsInd() {
+        return geoRsInd;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GeoMapLocation that = (GeoMapLocation) o;
+
+        if (coords != null ? !coords.equals(that.coords) : that.coords != null) return false;
+        if (rs != null ? !rs.equals(that.rs) : that.rs != null) return false;
+        return geoRsInd == that.geoRsInd;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = coords != null ? coords.hashCode() : 0;
+        result = 31 * result + (rs != null ? rs.hashCode() : 0);
+        result = 31 * result + (geoRsInd != null ? geoRsInd.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "{" +
                 "'coords' : " + coords +
-                ", 'riskScore' " + riskScore +
-                ", 'geoRiskScoreIndicator' : " + geoRiskScoreIndicator +
+                ", 'rs' :" + rs +
+                ", 'geoRsInd' : " + geoRsInd +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GeoMapLocation)) return false;
-
-        final GeoMapLocation that = (GeoMapLocation) o;
-
-        if (getCoords() != null ? !getCoords().equals(that.getCoords()) : that.getCoords() != null) return false;
-        if (getRiskScore() != null ? !getRiskScore().equals(that.getRiskScore()) : that.getRiskScore() != null)
-            return false;
-        return getGeoRiskScoreIndicator() == that.getGeoRiskScoreIndicator();
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getCoords() != null ? getCoords().hashCode() : 0;
-        result = 31 * result + (getRiskScore() != null ? getRiskScore().hashCode() : 0);
-        result = 31 * result + (getGeoRiskScoreIndicator() != null ? getGeoRiskScoreIndicator().hashCode() : 0);
-        return result;
     }
 }

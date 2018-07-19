@@ -48,6 +48,9 @@ public class GeoDataLoadServiceImpl implements GeoDataLoadService {
     @Value("${geo.data.load.location}")
     private String geoDataLoadLocation;
 
+    @Value("${geo.data.store.header}")
+    private String geoDataStoreHeader;
+
     @Autowired
     public GeoDataLoadServiceImpl(final GeoCoordinateRepository geoCoordinateRepository, CompressionService compressionService){
         this.geoCoordinateRepository = geoCoordinateRepository;
@@ -120,11 +123,11 @@ public class GeoDataLoadServiceImpl implements GeoDataLoadService {
                    logger.debug(String.format("Storing %d records ", coordinateRepositoryAll.size()));
                }
 
-               String record[] = {"Latitude","Longitude","Risk Score"};
-               csvWriter.writeNext(record);
+               csvWriter.writeNext(geoDataStoreHeader.split(","));
+
                for(GeoMapLocation entry:coordinateRepositoryAll){
                    csvWriter.writeNext(Arrays
-                           .asList(String.valueOf(entry.getCoords().getLat()), String.valueOf(entry.getCoords().getLng()), String.valueOf(entry.getRiskScore()))
+                           .asList(String.valueOf(entry.getCoords().getLat()), String.valueOf(entry.getCoords().getLng()), String.valueOf(entry.getRs()))
                            .toArray(new String[3]));
                }
            }
