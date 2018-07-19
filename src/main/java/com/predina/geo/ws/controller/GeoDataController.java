@@ -1,5 +1,7 @@
 package com.predina.geo.ws.controller;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.predina.geo.ws.model.GeoCoordinate;
 import com.predina.geo.ws.model.GeoMapLocation;
 import com.predina.geo.ws.services.GeoDataService;
@@ -11,7 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Rahul Anand Akkina
@@ -24,7 +28,7 @@ public class GeoDataController {
     private GeoDataService geoDataService;
 
     @Autowired
-    public GeoDataController(final GeoDataService geoDataService){
+    public GeoDataController(final GeoDataService geoDataService) {
         this.geoDataService = geoDataService;
     }
 
@@ -33,19 +37,30 @@ public class GeoDataController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<GeoMapLocation>> all(){
-        return new ResponseEntity<List<GeoMapLocation>>(geoDataService.findAll(),HttpStatus.OK);
+    public ResponseEntity<List<Map<String, Serializable>>> all() {
+        return new ResponseEntity<List<Map<String, Serializable>>>(
+                Lists.transform(geoDataService.findAll(),this::transform), HttpStatus.OK);
     }
 
     @GetMapping("/lookup/{lat}/{lng}")
-    public ResponseEntity<GeoMapLocation> lookup(@PathVariable("lat") final Double lat, @PathVariable("lng") final Double lng){
-        return new ResponseEntity<GeoMapLocation>(getGeoDataService().lookup(new GeoCoordinate(lat, lng)), HttpStatus.OK);
+    public ResponseEntity<Map<String, Serializable>> lookup(@PathVariable("lat") final Double lat, @PathVariable("lng") final Double lng) {
+        return new ResponseEntity<Map<String, Serializable>>(transform(getGeoDataService().lookup(new GeoCoordinate(lat, lng))), HttpStatus.OK);
     }
 
     @GetMapping("/update/{lat}/{lng}/{riskScore}")
     @SendTo("/topic/geoDataUpdates")
-    public ResponseEntity<GeoMapLocation> update(@PathVariable("lat") final Double lat, @PathVariable("lng") final Double lng, @PathVariable("riskScore") final Integer riskScore){
-        return new ResponseEntity<GeoMapLocation>(getGeoDataService().update(new GeoCoordinate(lat, lng), riskScore), HttpStatus.OK);
+    public ResponseEntity<Map<String, Serializable>> update(@PathVariable("lat") final Double lat, @PathVariable("lng") final Double lng, @PathVariable("riskScore") final Integer riskScore) {
+        return new ResponseEntity<Map<String, Serializable>>(transform(getGeoDataService().update(new GeoCoordinate(lat, lng), riskScore)), HttpStatus.OK);
     }
+
+
+    protected Map<String, Serializable> transform(final GeoMapLocation geoMapLocation){
+        return ImmutableMap.of("lat", geoMapLocation.getCoords().getLat(),
+                "lng",geoMapLocation.getCoords().getLng(),
+                "rs", geoMapLocation.getRs(),
+                "cin",geoMapLocation.getGid());
+    }
+
+
 
 }
