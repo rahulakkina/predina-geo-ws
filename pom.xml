@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>predina-geo-ws</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Geo-Data : Risk Tracker</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
