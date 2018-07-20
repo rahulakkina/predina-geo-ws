@@ -3,5 +3,11 @@ metadata:
 data:
   application.properties: |
     # spring application proeprties file
-    welcome = Hello from Kubernetes ConfigMap!!!
-    dummy = some value
+    spring.main.sources=com.predina.geo.ws
+    server.compression.enabled = true
+    server.compression.min-response-size = 5120
+    server.compression.mime-types = application/json,application/xml,text/xml,text/plain
+    spring.main.web-environment = true
+    geo.data.load.location=storage
+    geo.data.store.schedule=*/60 * * * * *
+    geo.data.store.header=Latitude,Longitude,Risk Score
