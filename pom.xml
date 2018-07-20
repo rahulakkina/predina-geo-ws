@@ -5,7 +5,7 @@
 
 	<groupId>com.predina.geo.ws</groupId>
 	<artifactId>predina-geo-ws</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>predina-geo-ws</name>
