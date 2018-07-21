@@ -7,7 +7,7 @@ spec:
       containers:
           - env:
              - name: JAVA_OPTIONS
-               value: "-Xmx1536m"
+               value: "-Xms1024m -Xmx1536m"
       volumes:
         - name: config
           configMap:
