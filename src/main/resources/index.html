@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta charset="utf-8">
+<title>Predina GEO Marker</title>
+<style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 600px;
+		width: 900px;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+</style>
+</head>
+<body>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBbeoLp1wm-tZdVX6t2kF1l0SkjX8iVNcU"></script>
+<div id="map"></div>
+<script type="text/javascript">
+
+/*
+ * use google maps api built-in mechanism to attach dom events
+ */
+google.maps.event.addDomListener(window, "load", function() {
+
+       
+
+        /*
+         * create map
+         */
+        var map = new google.maps.Map(document.getElementById("map"), {
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+        });
+
+        /*
+         * create infowindow (which will be used by markers)
+         */
+        var infoWindow = new google.maps.InfoWindow();
+        /*
+         * create bounds (which will be used auto zoom map)
+         */
+        var bounds = new google.maps.LatLngBounds();
+		
+		/*
+		 * getColor
+		 */
+		function getColor(c) {
+           if (c == 'G')
+              return "green";
+           else if (c == 'Y')
+              return "yellow";
+           else if (c == 'O')
+              return "orange";
+           else if (c == 'R')
+              return "red";
+           else
+              return "#8b0000";
+        }
+
+        /*
+         * marker creater function (acts as a closure for html parameter)
+         */
+        function createMarker(options, html) {
+            var marker = new google.maps.Marker(options);
+            bounds.extend(options.position);
+            if (html) {
+                google.maps.event.addListener(marker, "click", function() {
+                    infoWindow.setContent(html);
+                    infoWindow.open(options.map, this);
+                    map.setZoom(map.getZoom() + 1)
+                    map.setCenter(marker.getPosition());
+                });
+            }
+            return marker;
+        }
+		
+		function callback(p){
+		   var url = 'http://localhost:8080/page/'+p;
+		   var xhr = new XMLHttpRequest();
+           xhr.open("GET", url, true);
+		   xhr.onreadystatechange = function(){
+		      if (xhr.readyState != 4) {
+                 return;
+              }
+			  var obj = JSON.parse(xhr.responseText);
+			  var max = obj.m;
+			  var places = obj.d;	
+              for (var i = 0; i < places.length; i++) {
+			     var point = places[i];  
+				 createMarker({
+				       position: new google.maps.LatLng(point.lat, point.lng),
+					   map: map,
+					   icon: {
+                          path: google.maps.SymbolPath.CIRCLE,
+                          fillColor: getColor(point.cin),
+                          fillOpacity: .4,
+                          scale: 1,
+                          strokeColor: getColor(point.cin),                          
+                          strokeWeight: 1
+                       }},'');
+              }	
+              map.fitBounds(bounds);      
+              if(p < max){			       
+                  callback(p+1);
+              }else{
+			     return;
+			  }
+		   };
+		   xhr.send();	
+		}  	
+        callback(1);
+});		
+	
+</script>
+</body>
+</html>

@@ -53,7 +53,7 @@ public class GeoDataController {
     @GetMapping("/page/{pageId}")
     public ResponseEntity<Map<String, Serializable>> page(@PathVariable("pageId") final Integer pageId){
         final Map<String, Serializable> result = Maps.newHashMapWithExpectedSize(3);
-        final List<List<GeoMapLocation>> pages = Lists.partition(geoDataService.findAll(), 3060);
+        final List<List<GeoMapLocation>> pages = Lists.partition(geoDataService.findAll(), 22850);
         if(!CollectionUtils.isEmpty(pages)) {
             final ImmutableList<Map<String, Serializable>> data = ImmutableList.copyOf((pageId != null && pageId <= pages.size()) ?
                               Lists.transform(pages.get(pageId - 1),this::transform) : Lists.transform(pages.get(0),this::transform));
