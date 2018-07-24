@@ -7,9 +7,9 @@
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
-      #map {
-        height: 600px;
-		width: 900px;
+      #predina_map {
+        height: 500px;
+		width: 600px;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -20,12 +20,26 @@
 </style>
 </head>
 <body>
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBbeoLp1wm-tZdVX6t2kF1l0SkjX8iVNcU"/>
-<div id="map"/>
+<br/><br/>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBbeoLp1wm-tZdVX6t2kF1l0SkjX8iVNcU"></script>
+<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+<table border="0" width="100%">
+    <tr>
+        <td align="center"><br/></td>
+    </tr>
+    <tr>
+        <td align="center"><br/></td>
+    </tr>
+    <tr>
+        <td align="center"><div id="predina_map"/></td>
+    </tr>
+</table>
+
 <script type="text/javascript">
 
 /*
  * use google maps api built-in mechanism to attach dom events
+ * https://github.com/cyrilcherian/million-points-on-map
  */
 google.maps.event.addDomListener(window, "load", function() {
 
@@ -34,7 +48,7 @@ google.maps.event.addDomListener(window, "load", function() {
         /*
          * create map
          */
-        var map = new google.maps.Map(document.getElementById("map"), {
+        var map = new google.maps.Map(document.getElementById("predina_map"), {
             mapTypeId: google.maps.MapTypeId.ROADMAP,
         });
 
@@ -80,10 +94,23 @@ google.maps.event.addDomListener(window, "load", function() {
             return marker;
         }
 
-		var xhr = new XMLHttpRequest();
+		function windowsActiveXObject(){
+		    try {
+                return new ActiveXObject("Msxml2.XMLHTTP")
+            } catch (e) {
+                try {
+                    return new ActiveXObject("Microsoft.XMLHTTP")
+                } catch (e) {}
+
+            }
+		}
+
+		var xhr = (window.XMLHttpRequest) ? new XMLHttpRequest() :  windowsActiveXObject();
+		var markers = [];
+		var markerCluster = [];
 
 		function callback(p){
-		   var url = 'http://localhost:8080/page/'+p;
+		   var url = 'http://localhost:8080/page/'+p+'/75000';
            xhr.open("GET", url, true);
 		   xhr.onreadystatechange = function(){
 		      if (xhr.readyState != 4) {
@@ -91,33 +118,36 @@ google.maps.event.addDomListener(window, "load", function() {
               }
 			  var obj = JSON.parse(xhr.responseText);
 			  var max = obj.m;
-			  var places = obj.d;	
-              for (var i = 0; i < places.length; i++) {
-			     var point = places[i];  
-				 createMarker({
-				       position: new google.maps.LatLng(point.lat, point.lng),
+			  var places = obj.d;
+              for (var i = 0, len =  places.length; i < len; i++) {
+			     var point = places[i];
+				 var cMarker = createMarker({
+				       position: new google.maps.LatLng(point[0], point[1]),
 					   map: map,
 					   icon: {
                           path: google.maps.SymbolPath.CIRCLE,
-                          fillColor: getColor(point.cin),
+                          fillColor: getColor(point[2]),
                           fillOpacity: .4,
                           scale: 1,
-                          strokeColor: getColor(point.cin),                          
+                          strokeColor: getColor(point[2]),
                           strokeWeight: 1
                        }},'');
-              }	
-              map.fitBounds(bounds);      
-              if(p < max){			       
+				  markers.push(cMarker);
+              }
+			  markerCluster = new MarkerClusterer(map, markers,
+                                         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+              map.fitBounds(bounds);
+              if(p < max/2){
                   callback(p+1);
               }else{
 			     return;
 			  }
 		   };
-		   xhr.send();	
-		}  	
+		   xhr.send();
+		}
         callback(1);
-});		
-	
+
+});
 </script>
 </body>
 </html>
