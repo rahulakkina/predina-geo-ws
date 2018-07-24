@@ -40,8 +40,8 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
     private final Long startTime;
 
     @Autowired
-    public GeoCoordinateRepositoryImpl(final Geomem<Integer, GeoRiskScoreIndicator> geoMem){
-        this.geoMem = geoMem;
+    public GeoCoordinateRepositoryImpl(){
+        this.geoMem = new Geomem<Integer, GeoRiskScoreIndicator>();
         databaseRepo = new ConcurrentHashMap<>(2315754, 0.75f);
         random = new Random();
         this.startTime = System.currentTimeMillis();
