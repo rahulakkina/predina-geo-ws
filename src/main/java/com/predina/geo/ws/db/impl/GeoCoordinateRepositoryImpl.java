@@ -1,6 +1,5 @@
 package com.predina.geo.ws.db.impl;
 
-import com.github.davidmoten.geo.mem.Geomem;
 import com.github.davidmoten.geo.mem.Info;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -74,7 +73,7 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
 
         final GeoMapLocation geoMapLocation = new GeoMapLocation(geoCoordinate, riskScore);
 
-        geoMem.add(geoCoordinate.getLat(),geoCoordinate.getLng(), System.currentTimeMillis(), riskScore, geoMapLocation.getGid());
+        geoMem.add(geoCoordinate.getLat(),geoCoordinate.getLng(), (System.currentTimeMillis() - startTime), riskScore, geoMapLocation.getGid());
 
         return geoMapLocation;
     }
@@ -119,7 +118,7 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
     public List<GeoMapLocation> find(final GeoCoordinate topLeft, final GeoCoordinate bottomRight){
         final Iterable<Info<Integer, GeoRiskScoreIndicator>> iterable = geoMem.find(topLeft.getLat(), topLeft.getLng(),
                 bottomRight.getLat(), bottomRight.getLng(),
-                startTime, System.currentTimeMillis());
+                0, (System.currentTimeMillis() - startTime));
 
         return ImmutableList.copyOf(Iterables.transform(iterable, this::transform));
     }

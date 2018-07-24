@@ -79,6 +79,7 @@ public class GeoDataLoadServiceImpl implements GeoDataLoadService {
             }
 
             String[] nextRecord;
+            Integer count = 0;
             while ((nextRecord = csvReader.readNext()) != null) {
                 if (nextRecord.length > 2) {
                     if(StringUtils.isNotBlank(nextRecord[0]) && StringUtils.isNotBlank(nextRecord[1]) && StringUtils.isNotBlank(nextRecord[2])) {
@@ -88,6 +89,11 @@ public class GeoDataLoadServiceImpl implements GeoDataLoadService {
                     if(StringUtils.isNotBlank(nextRecord[0]) && StringUtils.isNotBlank(nextRecord[1])) {
                         resultSet.add(loadWithoutRiskScore(new GeoCoordinate(new BigDecimal(nextRecord[0]).doubleValue(), new BigDecimal(nextRecord[1]).doubleValue())));
                     }
+                }
+                count++;
+
+                if(count % 100000 == 0){
+                    logger.debug(String.format("Loaded %d records.", count));
                 }
             }
 
