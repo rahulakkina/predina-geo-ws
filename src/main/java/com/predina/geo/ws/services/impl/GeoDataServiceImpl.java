@@ -49,6 +49,11 @@ public class GeoDataServiceImpl implements GeoDataService {
     }
 
     @Override
+    public List<GeoMapLocation> find(final GeoCoordinate topLeft, final GeoCoordinate bottomRight){
+        return geoCoordinateRepository.find(topLeft, bottomRight);
+    }
+
+    @Override
     public void store() throws GeoDataException {
          geoDataLoadService.store();
     }

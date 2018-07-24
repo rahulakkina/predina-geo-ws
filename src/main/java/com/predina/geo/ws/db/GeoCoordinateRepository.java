@@ -26,4 +26,6 @@ public interface GeoCoordinateRepository extends Serializable {
     public GeoMapLocation find(final GeoCoordinate geoCoordinate);
 
     public List<GeoMapLocation> findAll();
+
+    public List<GeoMapLocation> find(final GeoCoordinate topLeft, final GeoCoordinate bottomRight);
 }

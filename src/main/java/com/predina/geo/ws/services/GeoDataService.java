@@ -20,6 +20,8 @@ public interface GeoDataService {
 
     public List<GeoMapLocation> findAll();
 
+    public List<GeoMapLocation> find(final GeoCoordinate topLeft, final GeoCoordinate bottomRight);
+
     public void store() throws GeoDataException;
 
 }

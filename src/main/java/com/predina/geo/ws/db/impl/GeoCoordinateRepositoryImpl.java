@@ -1,11 +1,16 @@
 package com.predina.geo.ws.db.impl;
 
+import com.github.davidmoten.geo.mem.Geomem;
+import com.github.davidmoten.geo.mem.Info;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.predina.geo.ws.db.GeoCoordinateRepository;
 import com.predina.geo.ws.model.GeoCoordinate;
 import com.predina.geo.ws.model.GeoMapLocation;
+import com.predina.geo.ws.model.GeoRiskScoreIndicator;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
@@ -28,11 +33,18 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
 
     private final Map<Double, Map<Double, Integer>> databaseRepo;
 
+    private final Geomem<Integer, GeoRiskScoreIndicator> geoMem;
+
     private final Random random;
 
-    public GeoCoordinateRepositoryImpl(){
+    private final Long startTime;
+
+    @Autowired
+    public GeoCoordinateRepositoryImpl(final Geomem<Integer, GeoRiskScoreIndicator> geoMem){
+        this.geoMem = geoMem;
         databaseRepo = new ConcurrentHashMap<>(2315754, 0.75f);
         random = new Random();
+        this.startTime = System.currentTimeMillis();
     }
 
 
@@ -60,7 +72,11 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
 
         databaseRepo.get(geoCoordinate.getLat()).put(geoCoordinate.getLng(),riskScore);
 
-        return new GeoMapLocation(geoCoordinate, riskScore);
+        final GeoMapLocation geoMapLocation = new GeoMapLocation(geoCoordinate, riskScore);
+
+        geoMem.add(geoCoordinate.getLat(),geoCoordinate.getLng(), System.currentTimeMillis(), riskScore, geoMapLocation.getGid());
+
+        return geoMapLocation;
     }
 
 
@@ -98,6 +114,21 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
         }
 
         return ImmutableList.copyOf(resultSet);
+    }
+
+    public List<GeoMapLocation> find(final GeoCoordinate topLeft, final GeoCoordinate bottomRight){
+        final Iterable<Info<Integer, GeoRiskScoreIndicator>> iterable = geoMem.find(topLeft.getLat(), topLeft.getLng(),
+                bottomRight.getLat(), bottomRight.getLng(),
+                startTime, System.currentTimeMillis());
+
+        return ImmutableList.copyOf(Iterables.transform(iterable, this::transform));
+    }
+
+    private GeoMapLocation transform(final Info<Integer, GeoRiskScoreIndicator> info){
+        final Double lat = info.lat();
+        final Double lng = info.lon();
+        final Integer riskScore = info.value();
+        return new GeoMapLocation(new GeoCoordinate(lat, lng), riskScore);
     }
 
 

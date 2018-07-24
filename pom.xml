@@ -189,6 +189,11 @@
 			<artifactId>fabric8-arquillian</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.davidmoten</groupId>
+			<artifactId>geo</artifactId>
+			<version>0.7.1</version>
+		</dependency>
 	</dependencies>
 
 

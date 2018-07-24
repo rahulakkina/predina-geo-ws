@@ -41,6 +41,10 @@ public class GeoDataController {
         return geoDataService;
     }
 
+    /**
+     *
+     * @return
+     */
     @CrossOrigin(origins = "*")
     @GetMapping("/all")
     public ResponseEntity<List<List<Serializable>>> all() {
@@ -49,6 +53,12 @@ public class GeoDataController {
     }
 
 
+    /**
+     *
+     * @param pageId
+     * @param pageSize
+     * @return
+     */
     @CrossOrigin(origins = "*")
     @GetMapping("/page/{pageId}/{pageSize}")
     public ResponseEntity<Map<String, Serializable>> page(@PathVariable("pageId") final Integer pageId, @PathVariable("pageSize") final Integer pageSize){
@@ -68,12 +78,25 @@ public class GeoDataController {
         return new ResponseEntity<Map<String, Serializable>>(result, HttpStatus.OK);
     }
 
+    /**
+     *
+     * @param lat
+     * @param lng
+     * @return
+     */
     @CrossOrigin(origins = "*")
     @GetMapping("/lookup/{lat}/{lng}")
     public ResponseEntity<List<Serializable>> lookup(@PathVariable("lat") final Double lat, @PathVariable("lng") final Double lng) {
         return new ResponseEntity<List<Serializable>>(transformList(getGeoDataService().lookup(new GeoCoordinate(lat, lng))), HttpStatus.OK);
     }
 
+    /**
+     *
+     * @param lat
+     * @param lng
+     * @param riskScore
+     * @return
+     */
     @CrossOrigin(origins = "*")
     @GetMapping("/update/{lat}/{lng}/{riskScore}")
     @SendTo("/topic/geoDataUpdates")
@@ -81,18 +104,39 @@ public class GeoDataController {
         return new ResponseEntity<List<Serializable>>(transformList(getGeoDataService().update(new GeoCoordinate(lat, lng), riskScore)), HttpStatus.OK);
     }
 
-
-    protected Map<String, Serializable> transform(final GeoMapLocation geoMapLocation){
-        return ImmutableMap.of("lat", geoMapLocation.getCoords().getLat(),
-                "lng",geoMapLocation.getCoords().getLng(),
-                "rs", geoMapLocation.getRs(),
-                "cin",geoMapLocation.getGid());
+    /**
+     *
+     * @param topLeftLat
+     * @param topLeftLng
+     * @param bottomRightLat
+     * @param bottomRightLng
+     * @return
+     */
+    @CrossOrigin(origins = "*")
+    @GetMapping("/find/{topLeftLat}/{topLeftLng}/{bottomRightLat}/{bottomRightLng}")
+    public ResponseEntity<List<List<Serializable>>> find(@PathVariable("topLeftLat") final Double topLeftLat, @PathVariable("topLeftLng") final Double topLeftLng,
+                  @PathVariable("bottomRightLat") final Double bottomRightLat, @PathVariable("bottomRightLng") final Double bottomRightLng){
+        return new ResponseEntity<List<List<Serializable>>>(Lists.transform(getGeoDataService().find(getCoord(topLeftLat, topLeftLng), getCoord(bottomRightLat, bottomRightLng)), this::transformList), HttpStatus.OK);
     }
 
+
+    /**
+     *
+     * @param lat
+     * @param lng
+     * @return
+     */
+    protected GeoCoordinate getCoord(final Double lat, final Double lng){
+        return new GeoCoordinate(lat, lng);
+    }
+
+    /**
+     *
+     * @param geoMapLocation
+     * @return
+     */
     protected List<Serializable> transformList(final GeoMapLocation geoMapLocation){
         return ImmutableList.of(geoMapLocation.getCoords().getLat(),geoMapLocation.getCoords().getLng(),geoMapLocation.getGid());
     }
-
-
 
 }

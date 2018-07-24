@@ -156,11 +156,4 @@ public class GeoDataLoadServiceImpl implements GeoDataLoadService {
                 .max((f1, f2) -> Long.compare(f1.lastModified(),
                                 f2.lastModified())).get();
     }
-
-    public static void main(String s[]) throws  GeoDataException {
-        final GeoDataLoadService geoDataLoadService = new GeoDataLoadServiceImpl(new GeoCoordinateRepositoryImpl(), new CompressionServiceImpl());
-         geoDataLoadService.load();
-         geoDataLoadService.store();
-    }
-
 }
