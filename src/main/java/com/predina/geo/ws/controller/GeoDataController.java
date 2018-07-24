@@ -114,9 +114,10 @@ public class GeoDataController {
      */
     @CrossOrigin(origins = "*")
     @GetMapping("/find/{topLeftLat}/{topLeftLng}/{bottomRightLat}/{bottomRightLng}")
-    public ResponseEntity<List<List<Serializable>>> find(@PathVariable("topLeftLat") final Double topLeftLat, @PathVariable("topLeftLng") final Double topLeftLng,
+    public ResponseEntity<Map<String, Serializable>> find(@PathVariable("topLeftLat") final Double topLeftLat, @PathVariable("topLeftLng") final Double topLeftLng,
                   @PathVariable("bottomRightLat") final Double bottomRightLat, @PathVariable("bottomRightLng") final Double bottomRightLng){
-        return new ResponseEntity<List<List<Serializable>>>(Lists.transform(getGeoDataService().find(getCoord(topLeftLat, topLeftLng), getCoord(bottomRightLat, bottomRightLng)), this::transformList), HttpStatus.OK);
+        final List<List<Serializable>> data = Lists.transform(getGeoDataService().find(getCoord(topLeftLat, topLeftLng), getCoord(bottomRightLat, bottomRightLng)), this::transformList);
+        return new ResponseEntity<Map<String, Serializable>>(ImmutableMap.of("s", (data != null ? data.size() : 0), "d", ImmutableList.copyOf(data)), HttpStatus.OK);
     }
 
 
@@ -135,7 +136,7 @@ public class GeoDataController {
      * @param geoMapLocation
      * @return
      */
-    protected List<Serializable> transformList(final GeoMapLocation geoMapLocation){
+    protected ImmutableList<Serializable> transformList(final GeoMapLocation geoMapLocation){
         return ImmutableList.of(geoMapLocation.getCoords().getLat(),geoMapLocation.getCoords().getLng(),geoMapLocation.getGid());
     }
 

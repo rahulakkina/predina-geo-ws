@@ -110,6 +110,7 @@ google.maps.event.addDomListener(window, "load", function() {
 		var markerCluster = [];
 
 		function callback(p){
+		   //var url = 'http://localhost:8080/find/61.215861140782756/-16.060280250000005/48.73237566003298/10.306907249999995';
 		   var url = 'http://localhost:8080/page/'+p+'/75000';
            xhr.open("GET", url, true);
 		   xhr.onreadystatechange = function(){
