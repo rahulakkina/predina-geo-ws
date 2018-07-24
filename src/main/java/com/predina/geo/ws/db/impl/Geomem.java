@@ -9,8 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.github.davidmoten.geo.Base32;
-import com.github.davidmoten.geo.Coverage;
-import com.github.davidmoten.geo.GeoHash;
 import com.github.davidmoten.geo.mem.Info;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
@@ -145,7 +143,7 @@ public class Geomem<T, R> {
      */
     private Iterable<Info<T, R>> find(long start, long finish, String withinHash) {
         long key = Base32.decodeBase32(withinHash);
-        SortedMap<Long, Info<T, R>> sortedByTime = mapByGeoHash.get(key);
+        final SortedMap<Long, Info<T, R>> sortedByTime = mapByGeoHash.get(key);
         if (sortedByTime == null)
             return Collections.emptyList();
         else
@@ -217,7 +215,7 @@ public class Geomem<T, R> {
      *            info record to add
      */
     public void add(Info<T, R> info) {
-        String hash = GeoHash.encodeHash(info.lat(), info.lon(), 26);
+        String hash = GeoHash.encodeHash(info.lat(), info.lon());
         addToMap(mapByGeoHash, info, hash);
         addToMapById(mapById, info, hash);
     }
