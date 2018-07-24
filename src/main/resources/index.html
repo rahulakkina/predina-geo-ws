@@ -9,7 +9,7 @@
        * element that contains the map. */
       #predina_map {
         height: 500px;
-		width: 600px;
+		width: 500px;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -17,10 +17,10 @@
         margin: 0;
         padding: 0;
       }
-</style>
+    </style>
+
 </head>
 <body>
-<br/><br/>
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBbeoLp1wm-tZdVX6t2kF1l0SkjX8iVNcU"></script>
 <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
 <table border="0" width="100%">
@@ -34,48 +34,14 @@
         <td align="center"><div id="predina_map"/></td>
     </tr>
 </table>
-
 <script type="text/javascript">
 
-/*
- * use google maps api built-in mechanism to attach dom events
- * https://github.com/cyrilcherian/million-points-on-map
- */
-google.maps.event.addDomListener(window, "load", function() {
-
-
-
-        /*
-         * create map
-         */
-        var map = new google.maps.Map(document.getElementById("predina_map"), {
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
-        });
-
-        /*
-         * create infowindow (which will be used by markers)
-         */
-        var infoWindow = new google.maps.InfoWindow();
-        /*
-         * create bounds (which will be used auto zoom map)
-         */
-        var bounds = new google.maps.LatLngBounds();
-
-		/*
-		 * getColor
-		 */
-		function getColor(c) {
-           if (c == 'G')
-              return "green";
-           else if (c == 'Y')
-              return "yellow";
-           else if (c == 'O')
-              return "orange";
-           else if (c == 'R')
-              return "red";
-           else
-              return "#8b0000";
-        }
+var map;
+var infoWindow;
+var bounds;
+var xhr;
+var markers;
+var markerCluster;
 
         /*
          * marker creater function (acts as a closure for html parameter)
@@ -94,33 +60,34 @@ google.maps.event.addDomListener(window, "load", function() {
             return marker;
         }
 
-		function windowsActiveXObject(){
-		    try {
-                return new ActiveXObject("Msxml2.XMLHTTP")
-            } catch (e) {
-                try {
-                    return new ActiveXObject("Microsoft.XMLHTTP")
-                } catch (e) {}
+		/*
+		 * getColor
+		 */
+		function getColor(c) {
+           if (c == 'G')
+              return "green";
+           else if (c == 'Y')
+              return "yellow";
+           else if (c == 'O')
+              return "orange";
+           else if (c == 'R')
+              return "red";
+           else
+              return "#8b0000";
+        }
 
-            }
-		}
-
-		var xhr = (window.XMLHttpRequest) ? new XMLHttpRequest() :  windowsActiveXObject();
-		var markers = [];
-		var markerCluster = [];
-
-		function callback(p){
-		   //var url = 'http://localhost:8080/find/61.215861140782756/-16.060280250000005/48.73237566003298/10.306907249999995';
-		   var url = 'http://localhost:8080/page/'+p+'/75000';
+		function callback(topLeftLat, topLeftLng, botRghtLat, botRghtLnt){
+		   var url = 'http://localhost:8080/find/'+topLeftLat+'/'+topLeftLng+'/'+botRghtLat+'/'+botRghtLnt;
            xhr.open("GET", url, true);
 		   xhr.onreadystatechange = function(){
 		      if (xhr.readyState != 4) {
                  return;
               }
 			  var obj = JSON.parse(xhr.responseText);
-			  var max = obj.m;
+              var len = obj.s;
 			  var places = obj.d;
-              for (var i = 0, len =  places.length; i < len; i++) {
+              markers = [];
+              for (var i = 0; i < len; i++) {
 			     var point = places[i];
 				 var cMarker = createMarker({
 				       position: new google.maps.LatLng(point[0], point[1]),
@@ -133,22 +100,57 @@ google.maps.event.addDomListener(window, "load", function() {
                           strokeColor: getColor(point[2]),
                           strokeWeight: 1
                        }},'');
-				  markers.push(cMarker);
+				 markers.push(cMarker);
               }
 			  markerCluster = new MarkerClusterer(map, markers,
                                          {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
               map.fitBounds(bounds);
-              if(p < max/2){
-                  callback(p+1);
-              }else{
-			     return;
-			  }
 		   };
 		   xhr.send();
 		}
-        callback(1);
 
+		function refreshMap() {
+             if (markerCluster) {
+                markerCluster.clearMarkers();
+             }
+			 var b = map.getBounds();
+
+			 alert(map.getZoom()+","+b);
+		}
+
+/*
+ * use google maps api built-in mechanism to attach dom events
+ */
+google.maps.event.addDomListener(window, "load", function() {
+
+        xhr = new XMLHttpRequest();
+        markers = [];
+
+        /*
+         * create map
+         */
+        map = new google.maps.Map(document.getElementById("predina_map"), {
+		    zoom: 5,
+            center: new google.maps.LatLng(55.4,0.5),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+
+
+        /*
+         * create infowindow (which will be used by markers)
+         */
+        infoWindow = new google.maps.InfoWindow();
+        /*
+         * create bounds (which will be used auto zoom map)
+         */
+        bounds = new google.maps.LatLngBounds();
+
+		map.addListener('zoom_changed', refreshMap);
+
+        //callback(60.9, -9.0, 49.9, 10.0);
 });
+
 </script>
 </body>
 </html>
