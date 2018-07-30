@@ -8,8 +8,8 @@
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #predina_map {
-        height: 600px;
-		width: 800px;
+        height: 500px;
+		width: 600px;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -113,18 +113,10 @@ var markerCluster;
                           fillOpacity: .4,
                           scale: 1,
                           strokeColor: getColor(point[2]),
-                          strokeWeight: 2
+                          strokeWeight: 1
                        }},'');
 				 markers.push(cMarker);
               }
-
-			  /*if(zoom < 15){
-			      markerCluster = new MarkerClusterer(map, markers,
-                                         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
-
-			      google.maps.event.addListener(markerCluster, 'clusterclick', markerClusterClick);
-			  }*/
-
               map.fitBounds(bounds);
 		   };
 		   xhr.send();
@@ -179,7 +171,7 @@ google.maps.event.addDomListener(window, "load", function() {
 
 		refreshMap();
 
-		map.addListener('zoom_changed', refreshMap);
+		map.addListener('click', refreshMap);
 
         //callback(60.9, -9.0, 49.9, 10.0);
 });

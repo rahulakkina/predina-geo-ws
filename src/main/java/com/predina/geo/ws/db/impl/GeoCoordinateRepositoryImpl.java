@@ -156,6 +156,8 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
                     return ImmutableList.copyOf(clusters);
                 }
             }
+        }else{
+            logger.info(String.format("CLUSTERING NOT REQUIRED : %s,%s,%d", topLeft, bottomRight, gMapSize));
         }
 
         return ImmutableList.copyOf(geoMapLocations);
