@@ -1,11 +1,15 @@
 package com.predina.geo.ws.api;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.predina.geo.ws.model.GeoCoordinate;
 import com.predina.geo.ws.model.GeoMapLocation;
+import com.predina.geo.ws.model.LongSparseArray;
 
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class GeoUtil {
 
@@ -41,7 +45,7 @@ public abstract class GeoUtil {
         return y;
     }
 
-    public static List<GeoMapLocation> generateClusters(final List<GeoMapLocation> geoLocations, final Integer zoom) {
+    public static List<GeoMapLocation> generateClusters(final Iterable<GeoMapLocation> geoLocations, final Integer zoom) {
 
         final List<GeoMapLocation> clusters = Lists.newArrayList();
 
@@ -77,6 +81,44 @@ public abstract class GeoUtil {
             }
         }
 
+        return clusters;
+    }
+
+    public static Long getCoordinate(final Long numCells, final Double x, final Double y) {
+        return (long) (numCells * Math.floor(x) + Math.floor(y));
+    }
+
+
+    public static Set<GeoMapLocation> generateClusters(final Iterable<GeoMapLocation> geoLocations, final Integer zoom, final Integer mGridSize) {
+
+        final List<GeoMapLocation> mItems = Lists.newArrayList(geoLocations);
+
+        final Long numCells = (long) Math.ceil(256 * Math.pow(2, zoom) / mGridSize);
+
+        final SphericalMercatorProjection proj = new SphericalMercatorProjection((double)numCells);
+
+        final Set<GeoMapLocation> clusters = Sets.newHashSet();
+
+        final LongSparseArray<GeoMapLocation> sparseArray = new LongSparseArray<>();
+
+
+        for (GeoMapLocation item : mItems) {
+
+           final GeoMapLocation p = proj.toPoint(item);
+
+           final Long coordinate = getCoordinate(numCells, p.getCoords().getLat(), p.getCoords().getLng());
+
+           GeoMapLocation cluster = sparseArray.get(coordinate);
+
+           if (cluster == null) {
+                cluster = proj.toLatLng(
+                            new GeoMapLocation( new GeoCoordinate((Math.floor(p.getCoords().getLat()) + .5),  (Math.floor(p.getCoords().getLng()) + .5))
+                                    , p.getRs()));
+                    sparseArray.put(coordinate, cluster);
+                    clusters.add(cluster);
+                }
+                //cluster.add(item);
+        }
         return clusters;
     }
 

@@ -4,18 +4,23 @@ import com.github.davidmoten.geo.mem.Info;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.predina.geo.ws.api.GeoUtil;
+import com.predina.geo.ws.api.Geomem;
 import com.predina.geo.ws.db.GeoCoordinateRepository;
 import com.predina.geo.ws.model.GeoCoordinate;
 import com.predina.geo.ws.model.GeoMapLocation;
 import com.predina.geo.ws.model.GeoRiskScoreIndicator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Map.Entry;
 
@@ -37,6 +42,16 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
     private final Random random;
 
     private final Long startTime;
+
+    @Value("${geo.data.page.default-size}")
+    private Integer clusterFuzzyLimit;
+
+    @Value("${geo.data.page.default-min-size}")
+    private Integer minFuzzyLimit;
+
+
+    @Value("${geo.data.page.default-grid-size}")
+    private Integer mGridSize;
 
     @Autowired
     public GeoCoordinateRepositoryImpl(){
@@ -120,7 +135,30 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
                 bottomRight.getLat(), bottomRight.getLng(),
                 0, (System.currentTimeMillis() - startTime));
 
-        return ImmutableList.copyOf(Iterables.transform(iterable, this::transform));
+        final Iterable<GeoMapLocation> geoMapLocations = Iterables.transform(iterable, this::transform);
+        final Integer gMapSize = Iterables.size(geoMapLocations);
+
+        if(logger.isDebugEnabled()) {
+            logger.debug(gMapSize + "," + clusterFuzzyLimit);
+        }
+
+        //Fuzzy Logic to limit the number of markers.
+        if(gMapSize > clusterFuzzyLimit){
+            for(int i = 5; i <= 20; i++){
+                final Set<GeoMapLocation> clusters = GeoUtil.generateClusters(geoMapLocations, i, mGridSize);
+                final Integer clusterSize = !CollectionUtils.isEmpty(clusters) ? clusters.size() : 0;
+
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Zoom : " + i + ", Cluster Size : " + clusterSize);
+                }
+
+                if(clusterSize <= clusterFuzzyLimit && clusterSize >= minFuzzyLimit){
+                    return ImmutableList.copyOf(clusters);
+                }
+            }
+        }
+
+        return ImmutableList.copyOf(geoMapLocations);
     }
 
     private GeoMapLocation transform(final Info<Integer, GeoRiskScoreIndicator> info){

@@ -11,3 +11,5 @@ data:
     geo.data.load.location=storage
     geo.data.store.schedule=*/60 * * * * *
     geo.data.store.header=Latitude,Longitude,Risk Score
+    geo.data.page.default-size=10000
+    geo.data.page.default-grid-size=100
