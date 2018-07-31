@@ -113,7 +113,7 @@ public abstract class GeoUtil {
            if (cluster == null) {
                 cluster = proj.toLatLng(
                             new GeoMapLocation( new GeoCoordinate((Math.floor(p.getCoords().getLat()) + .5),  (Math.floor(p.getCoords().getLng()) + .5))
-                                    , p.getRs()));
+                                    , p.getRs(), true));
                     sparseArray.put(coordinate, cluster);
                     clusters.add(cluster);
                 }

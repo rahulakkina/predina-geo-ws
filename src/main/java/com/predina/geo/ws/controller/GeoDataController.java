@@ -137,7 +137,7 @@ public class GeoDataController {
      * @return
      */
     protected ImmutableList<Serializable> transformList(final GeoMapLocation geoMapLocation){
-        return ImmutableList.of(geoMapLocation.getCoords().getLat(),geoMapLocation.getCoords().getLng(),geoMapLocation.getGid());
+        return ImmutableList.of(geoMapLocation.getCoords().getLat(),geoMapLocation.getCoords().getLng(),geoMapLocation.getGid(), geoMapLocation.getZ());
     }
 
 }

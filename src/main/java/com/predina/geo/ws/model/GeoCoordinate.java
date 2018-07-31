@@ -21,8 +21,7 @@ public class GeoCoordinate implements Serializable{
     private final Double lng;
 
     public GeoCoordinate(){
-        this.lat = 0.0;
-        this.lng = 0.0;
+        this(0.0,0.0);
     }
 
     public GeoCoordinate(final Double lat, final Double lng) {

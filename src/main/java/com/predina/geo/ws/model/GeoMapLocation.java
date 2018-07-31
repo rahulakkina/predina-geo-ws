@@ -24,15 +24,21 @@ public class GeoMapLocation implements Serializable {
     @XmlElement(name = "gid")
     private final GeoRiskScoreIndicator gid;
 
+    @XmlElement(name = "z")
+    private final Boolean z;
+
     public GeoMapLocation(){
-        this.coords = new GeoCoordinate();
-        this.rs = 1;
-        this.gid = G;
+        this(new GeoCoordinate(),1);
     }
 
     public GeoMapLocation(final GeoCoordinate coords, final Integer rs) {
+        this(coords, rs, false);
+    }
+
+    public GeoMapLocation(final GeoCoordinate coords, final Integer rs, final Boolean z) {
         this.coords = coords;
         this.rs = rs;
+        this.z = z;
         this.gid = (rs >= 1 && rs <= 3) ? G:
                 (rs >= 4 && rs <= 5) ? Y:
                         (rs >= 6 && rs <= 7) ? O :
@@ -49,6 +55,10 @@ public class GeoMapLocation implements Serializable {
 
     public GeoRiskScoreIndicator getGid() {
         return gid;
+    }
+
+    public Boolean getZ() {
+        return z;
     }
 
     @Override
