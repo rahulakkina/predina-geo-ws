@@ -63,12 +63,12 @@ var markerCluster;
          */
         function createMarker(options, html) {
             var marker = new google.maps.Marker(options);
-            bounds.extend(options.position);
+            //bounds.extend(options.position);
             if (html) {
                 google.maps.event.addListener(marker, "click", function() {
                     infoWindow.setContent(html);
                     infoWindow.open(options.map, this);
-                    map.setZoom(map.getZoom() + 1)
+                    map.setZoom(map.getZoom() + 1);
                     map.setCenter(marker.getPosition());
                 });
             }
