@@ -59,10 +59,61 @@ var markerCluster;
 		  }
 		}
 
-		function markerUpdate(lat, lng, op){
-		  var riskValue = op.value;
-		  // TODO;
+		function findMarker(lat, lng){
+		    var mSize = markers.length;
+			for(var i = 0; i < mSize;i++){
+			   var latLng = markers[i].getPosition();
+			   if(latLng.lat() === lat && latLng.lng() === lng){
+			       return markers[i];
+			   }
+			}
+			return null;
+		}
 
+		function markerUpdate(lat, lng, op){
+		  var marker = findMarker(lat, lng);
+		  var riskScore = op.value;
+		  var url = 'http://localhost:7001/update/'+lat+'/'+lng+'/'+riskScore;
+          xhr.open("GET", url, true);
+		  xhr.onreadystatechange = function(){
+		      if (xhr.readyState != 4) {
+                 return;
+              }
+
+			  var point = JSON.parse(xhr.responseText);
+
+			  if(marker != null){
+			      marker.setIcon({
+                          path: google.maps.SymbolPath.CIRCLE,
+                          fillColor: getColor(point[2]),
+                          fillOpacity: .4,
+                          scale: 4,
+                          strokeColor: getColor(point[2]),
+                          strokeWeight: 1
+                       });
+			      var html = getInfoWindowHtml(point[0], point[1], point[4]);
+				  google.maps.event.addListener(marker, "click", function() {
+                    infoWindow.setContent(html);
+                    infoWindow.open(options.map, this);
+                    map.setZoom(map.getZoom() + 1);
+                    map.setCenter(marker.getPosition());
+                });
+			  }else{
+			     marker = createMarker({
+				       position: new google.maps.LatLng(point[0], point[1]),
+					   map: map,
+					   icon: {
+                          path: google.maps.SymbolPath.CIRCLE,
+                          fillColor: getColor(point[2]),
+                          fillOpacity: .4,
+                          scale: 4,
+                          strokeColor: getColor(point[2]),
+                          strokeWeight: 1
+                       }},getInfoWindowHtml(point[0], point[1], point[4]));
+			  }
+
+	      };
+		  xhr.send();
 		}
 
 		function getInfoWindowHtml(lat, lng, rs){
