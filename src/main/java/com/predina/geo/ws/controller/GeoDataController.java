@@ -117,7 +117,11 @@ public class GeoDataController {
     public ResponseEntity<Map<String, Serializable>> find(@PathVariable("topLeftLat") final Double topLeftLat, @PathVariable("topLeftLng") final Double topLeftLng,
                   @PathVariable("bottomRightLat") final Double bottomRightLat, @PathVariable("bottomRightLng") final Double bottomRightLng){
         final List<List<Serializable>> data = Lists.transform(getGeoDataService().find(getCoord(topLeftLat, topLeftLng), getCoord(bottomRightLat, bottomRightLng)), this::transformList);
-        return new ResponseEntity<Map<String, Serializable>>(ImmutableMap.of("s", (data != null ? data.size() : 0), "d", ImmutableList.copyOf(data)), HttpStatus.OK);
+        return new ResponseEntity<Map<String, Serializable>>(ImmutableMap.of(
+                "s", (data != null ? data.size() : 0),
+                "d", ImmutableList.copyOf(data),
+                "z", (!CollectionUtils.isEmpty(data) ? data.get(0).get(3) : false)
+        ), HttpStatus.OK);
     }
 
 
