@@ -53,6 +53,12 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
     @Value("${geo.data.page.default-grid-size}")
     private Integer mGridSize;
 
+    @Value("${geo.data.page.drill.min}")
+    private Integer drillMin;
+
+    @Value("${geo.data.page.drill.max}")
+    private Integer drillMax;
+
     @Autowired
     public GeoCoordinateRepositoryImpl(){
         this.geoMem = new Geomem<Integer, GeoRiskScoreIndicator>();
@@ -144,12 +150,12 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
 
         //Fuzzy Logic to limit the number of markers.
         if(gMapSize > clusterFuzzyLimit){
-            for(int i = 5; i <= 20; i++){
+            for(int i = drillMin; i <= drillMax; i++){
                 final Set<GeoMapLocation> clusters = GeoUtil.generateClusters(geoMapLocations, i, mGridSize);
                 final Integer clusterSize = !CollectionUtils.isEmpty(clusters) ? clusters.size() : 0;
 
                 if(logger.isDebugEnabled()) {
-                    logger.debug("Zoom : " + i + ", Cluster Size : " + clusterSize);
+                    logger.debug(String.format("Drill : %d, Cluster Size : %d", i, clusterSize));
                 }
 
                 if(clusterSize <= clusterFuzzyLimit && clusterSize >= minFuzzyLimit){
@@ -157,7 +163,9 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
                 }
             }
         }else{
-            logger.info(String.format("CLUSTERING NOT REQUIRED : %s,%s,%d", topLeft, bottomRight, gMapSize));
+            if(logger.isDebugEnabled()) {
+                logger.debug(String.format("Clustering is not required : [%s, %s, %d]", topLeft, bottomRight, gMapSize));
+            }
         }
 
         return ImmutableList.copyOf(geoMapLocations);

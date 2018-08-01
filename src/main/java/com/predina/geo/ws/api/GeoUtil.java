@@ -89,11 +89,11 @@ public abstract class GeoUtil {
     }
 
 
-    public static Set<GeoMapLocation> generateClusters(final Iterable<GeoMapLocation> geoLocations, final Integer zoom, final Integer mGridSize) {
+    public static Set<GeoMapLocation> generateClusters(final Iterable<GeoMapLocation> geoLocations, final Integer drill, final Integer mGridSize) {
 
         final List<GeoMapLocation> mItems = Lists.newArrayList(geoLocations);
 
-        final Long numCells = (long) Math.ceil(256 * Math.pow(2, zoom) / mGridSize);
+        final Long numCells = (long) Math.ceil(256 * Math.pow(2, drill) / mGridSize);
 
         final SphericalMercatorProjection proj = new SphericalMercatorProjection((double)numCells);
 

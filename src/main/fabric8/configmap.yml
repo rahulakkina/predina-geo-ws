@@ -13,3 +13,6 @@ data:
     geo.data.store.header=Latitude,Longitude,Risk Score
     geo.data.page.default-size=10000
     geo.data.page.default-grid-size=100
+    geo.data.page.default-min-size=1000
+    geo.data.page.drill.min=5
+    geo.data.page.drill.max=20
