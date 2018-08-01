@@ -32,7 +32,7 @@ public class SphericalMercatorProjection {
         final Double sinY = Math.sin(Math.toRadians(latLng.getCoords().getLat()));
         final Double y = 0.5 * Math.log((1 + sinY) / (1 - sinY)) / -(2 * Math.PI) + .5;
 
-        return new GeoMapLocation(new GeoCoordinate(x * mWorldWidth, y * mWorldWidth), latLng.getRs());
+        return new GeoMapLocation(new GeoCoordinate(x * mWorldWidth, y * mWorldWidth), latLng.getRs(), true);
     }
 
     public GeoMapLocation toLatLng(final GeoMapLocation location) {
@@ -43,6 +43,6 @@ public class SphericalMercatorProjection {
         double y = .5 - (point.getLng() / mWorldWidth);
         final double lat = 90 - Math.toDegrees(Math.atan(Math.exp(-y * 2 * Math.PI)) * 2);
 
-        return new GeoMapLocation(new GeoCoordinate(lat, lng), location.getRs());
+        return new GeoMapLocation(new GeoCoordinate(lat, lng), location.getRs(), true);
     }
 }
