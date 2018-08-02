@@ -32,7 +32,7 @@
         <td colspan="2" align="center"><br/><br/></td>
     </tr>
     <tr>
-        <td colspan="2" align="center"><div id="predina_map"/></td>
+        <td colspan="2" align="center"><div id="predina_google_map"/></td>
     </tr>
 </table>
 <script type="text/javascript">
@@ -73,7 +73,7 @@ var markerCluster;
 		function markerUpdate(lat, lng, op){
 		  var marker = findMarker(lat, lng);
 		  var riskScore = op.value;
-		  var url = 'http://localhost:7001/update/'+lat+'/'+lng+'/'+riskScore;
+		  var url = '/update/'+lat+'/'+lng+'/'+riskScore;
           xhr.open("GET", url, true);
 		  xhr.onreadystatechange = function(){
 		      if (xhr.readyState != 4) {
@@ -170,7 +170,7 @@ var markerCluster;
         }
 
 		function callback(topLeftLat, topLeftLng, botRghtLat, botRghtLng, zoom){
-		   var url = 'http://localhost:7001/find/'+topLeftLat+'/'+topLeftLng+'/'+botRghtLat+'/'+botRghtLng;
+		   var url = '/find/'+topLeftLat+'/'+topLeftLng+'/'+botRghtLat+'/'+botRghtLng;
            xhr.open("GET", url, true);
 		   xhr.onreadystatechange = function(){
 		      if (xhr.readyState != 4) {
@@ -265,7 +265,7 @@ google.maps.event.addDomListener(window, "load", function() {
         /*
          * create map
          */
-        map = new google.maps.Map(document.getElementById("predina_map"), {
+        map = new google.maps.Map(document.getElementById("predina_google_map"), {
 		    zoom: 5,
             center: new google.maps.LatLng(55.4,0.5),
             mapTypeId: google.maps.MapTypeId.ROADMAP,
