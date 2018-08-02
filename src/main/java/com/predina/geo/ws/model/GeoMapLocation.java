@@ -40,9 +40,7 @@ public class GeoMapLocation implements Serializable {
         this.rs = rs;
         this.z = z;
         this.gid = (rs >= 1 && rs <= 3) ? G:
-                (rs >= 4 && rs <= 5) ? Y:
-                        (rs >= 6 && rs <= 7) ? O :
-                                (rs == 8) ? R : D;
+                        (rs >= 3 && rs <= 6) ? Y : R;
     }
 
     public GeoCoordinate getCoords() {

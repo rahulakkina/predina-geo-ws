@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -108,6 +109,23 @@ public class GeoDataLoadServiceImpl implements GeoDataLoadService {
         return ImmutableList.copyOf(resultSet);
     }
 
+    @Scheduled(cron = "${geo.data.refresh.schedule}")
+    @PreDestroy
+    @Override
+    public void refresh() throws GeoDataException{
+        final List<GeoMapLocation> all = geoCoordinateRepository.findAll();
+
+        if(!CollectionUtils.isEmpty(all)){
+            if(logger.isDebugEnabled()) {
+                logger.debug("Refersh Started");
+            }
+            all.stream().forEach(gl -> {loadWithoutRiskScore(gl.getCoords());});
+            if(logger.isDebugEnabled()) {
+                logger.debug("Refersh Ended");
+            }
+        }
+    }
+
     @Scheduled(cron = "${geo.data.store.schedule}")
     @PreDestroy
     @Override
@@ -115,8 +133,8 @@ public class GeoDataLoadServiceImpl implements GeoDataLoadService {
 
         final String fileName = String.format("%s/%s.csv",geoDataLoadLocation, "Coordinates");
 
-        if(logger.isInfoEnabled()) {
-            logger.info(String.format("Storing Coordinates File : %s", fileName));
+        if(logger.isDebugEnabled()) {
+            logger.debug(String.format("Storing Coordinates File : %s", fileName));
         }
 
         try(CSVWriter csvWriter = new CSVWriter(new FileWriter(fileName));){

@@ -22,4 +22,6 @@ public interface GeoDataLoadService {
 
     public void store() throws GeoDataException;
 
+    public void refresh() throws GeoDataException;
+
 }

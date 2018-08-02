@@ -94,7 +94,7 @@ public class GeoCoordinateRepositoryImpl implements GeoCoordinateRepository {
 
         final GeoMapLocation geoMapLocation = new GeoMapLocation(geoCoordinate, riskScore);
 
-        geoMem.add(geoCoordinate.getLat(),geoCoordinate.getLng(), (System.currentTimeMillis() - startTime), riskScore, geoMapLocation.getGid());
+        geoMem.add(geoCoordinate.getLat(), geoCoordinate.getLng(), (System.currentTimeMillis() - startTime), riskScore, geoMapLocation.getGid());
 
         return geoMapLocation;
     }
